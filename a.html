@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="nameSection">
+                <input type="text" name="username">
+            </div>
+            <div class="ageSection">
+                <input type="text" name="age">
+            </div>  
+            <div class="buttonSection">
+                <button id="addUser">Add</button>
+            </div>  
+            <div class="buttonSection">
+                <button id="deleteUser">Delete</button>
+            </div>  
+            <div class="buttonSection">
+                <button id="updateUser">Update</button>
+            </div>  
+            <div class="userList">
+                <ul id="userOrderList">
+
+                </ul>
+            </div>  
+
+        </div>
+
+
+        <script>
+            const addButton = document.getElementById('addUser');
+            const deleteButton = document.getElementById('deleteUser');
+            const updateButton = document.getElementById('updateUser');
+            let userListStorage = JSON.parse(localStorage.getItem("userList")) || [];
+            let userNames = [];
+            let userObjectList = [];
+            var ul = document.getElementById("userOrderList");
+            let userInp = document.querySelector('input[name="username"]');
+            let ageInp = document.querySelector('input[name="age"]');
+
+            function cleanInput() {
+                userInp.value = "";
+                ageInp.value = "";
+            }
+
+            if(userListStorage !== null){
+                for(let i = 0; i < userListStorage.length; i++){
+                    userObjectList.push(userListStorage[i]);
+                    userNames.push(userListStorage[i]['name']);
+
+                    var li = document.createElement("li");
+                    var fullName = userListStorage[i]['name'] + ' ' + userListStorage[i]['age'];
+                    li.className = userListStorage[i]['name'];
+                    li.appendChild(document.createTextNode(fullName));
+                    ul.appendChild(li);
+                }
+            }
+
+            addButton.addEventListener('click', () => {
+                let userName = document.querySelector('input[name="username"]').value;
+                let age = document.querySelector('input[name="age"]').value;
+                if(userNames.includes(userName)){
+                    alert('This name is added before, try it again');
+                    cleanInput();
+                    return;
+                } 
+
+                let newItem = {
+                    'name':  userName,
+                    'age': age
+                }
+
+
+                userObjectList.push(newItem);
+                localStorage.setItem('userList', JSON.stringify(userObjectList));
+                userNames.push(userName);
+
+                var li = document.createElement("li");
+                var fullName = userName + ' ' + age;
+                li.className = userName;
+                li.appendChild(document.createTextNode(fullName));
+                ul.appendChild(li);
+
+                cleanInput();
+
+            });
+
+            deleteButton.addEventListener('click', () => {
+                let userName = document.querySelector('input[name="username"]').value;
+
+                if(userNames.includes(userName)){
+                    userNames = userNames.filter(item => item !== userName);
+
+                    for(let i=0; i < userObjectList.length ; i++) {
+                        if(userObjectList[i]['name'] == userName){
+                            userObjectList.splice(i, 1);
+                        }
+                    }
+
+                    let items = document.getElementsByClassName(userName);
+
+                    items[0].remove();
+
+                    localStorage.setItem('userList', JSON.stringify(userObjectList));
+                } else {
+                    alert('Please check your username if it is included to the list');
+                }
+
+                cleanInput();
+            });
+
+
+            updateButton.addEventListener('click', () => {
+                let userName = document.querySelector('input[name="username"]').value; 
+                let age = document.querySelector('input[name="age"]').value;
+                if(userNames.includes(userName) && age !== ""){
+                    let updateAge = document.querySelector('li[class="'+userName+'"]');
+                    updateAge.innerHTML = userName + " " + age;
+
+                    for(let i=0; i < userObjectList.length ; i++) {
+                        if(userObjectList[i]['name'] == userName){
+                            userObjectList[i]['age'] = age;
+                        }
+                    }
+
+                    localStorage.setItem('userList', JSON.stringify(userObjectList));
+                } else {
+                    alert('Please check your username if it is included to the list');
+                }
+
+                cleanInput();
+                
+            });
+            
+
+            
+
+        </script>
+    </body>
+</html>
